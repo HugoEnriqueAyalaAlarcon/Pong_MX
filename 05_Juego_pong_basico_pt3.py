@@ -4,7 +4,7 @@ pygame.init()
 
 #zona variables
 ancho_ventana=(pygame.display.get_desktop_sizes()[0][0])
-alto_ventana=(pygame.display.get_desktop_sizes()[0][1]*.90)
+alto_ventana=(pygame.display.get_desktop_sizes()[0][1]*.85)
 
 screen=pygame.display.set_mode(((ancho_ventana),(alto_ventana)))
 pygame.display.set_caption("Pong basico") #titulo ventana
@@ -44,6 +44,10 @@ player_2_y_speed=0
 #reloj
 clock=pygame.time.Clock()
 
+#sonidos
+musica=pygame.mixer.Sound("sound/musica.ogg")
+punto=pygame.mixer.Sound("sound/punto.ogg")
+golpe=pygame.mixer.Sound("sound/golpe.ogg")
 
 #funciones
 def textos(fuente="arial",tam_txt=50,contenido="sin contenido",color=NEGRO,x=100,y=100):
@@ -59,10 +63,10 @@ def menu():
             if event.type==pygame.QUIT:
                 sys.exit()
 
-            if event.type==pygame.KEYDOWN: #si tenemos un efento de precionar una tecla
-                if event.key==pygame.K_SPACE: #si se preciona la tecla spac
+            if event.type==pygame.KEYDOWN: #si tenemos un evento de precionar una tecla
+                if event.key==pygame.K_SPACE: 
                     return True
-                if event.key==pygame.K_ESCAPE: #si se preciona la tecla spac
+                if event.key==pygame.K_ESCAPE: 
                     return False
      #zona dibujo
         textos("Chilanka",25,"Preciona Espacio:",CAFE_C,(ancho_ventana//2)-(201/2),(alto_ventana//2)+(42)) #texto preciona espacio
@@ -100,9 +104,11 @@ def juego(coord_pelota_x,coord_pelota_y,player_1_y_coord,player_2_y_coord,player
                 sys.exit()
             if event.type==pygame.KEYDOWN: #si tenemos un efento de precionar una tecla
                 if event.key==pygame.K_ESCAPE: #si se preciona la tecla esc
+                    pygame.mixer.Sound.stop(musica)
                     if (menu()==False):
                         return
-
+                    pygame.mixer.Sound.play(musica,-1)
+                    
                 #jugador 1
                 if event.key==pygame.K_w: #si la tecla que se preciono es w (se mueve hacia ariba el jugador 1)
                     player_1_y_speed=-3
@@ -129,12 +135,16 @@ def juego(coord_pelota_x,coord_pelota_y,player_1_y_coord,player_2_y_coord,player
      # Zona logica
         # si la pelota sale por los costatos incrementar puntos
         if (coord_pelota_x < 0):
+            punto.play(0,800)
+            pygame.mixer.Sound.set_volume(punto,0.7)
             score_player_2+=1
             coord_pelota_x=(ancho_ventana//2)
             coord_pelota_y=(alto_ventana//2)
          
 
         if coord_pelota_x>(ancho_ventana):
+            punto.play(0,800)
+            pygame.mixer.Sound.set_volume(punto,0.5)
             score_player_1+=1
             coord_pelota_x=(ancho_ventana//2)
             coord_pelota_y=(alto_ventana//2)
@@ -179,6 +189,8 @@ def juego(coord_pelota_x,coord_pelota_y,player_1_y_coord,player_2_y_coord,player
      # Zona de coliciones
         #colicion de pelota con jugador
         if pelota.colliderect(player_1) or pelota.colliderect(player_2):
+            golpe.play(0)
+            pygame.mixer.Sound.set_volume(golpe,0.9)#bajar volumen
             speed_x*=-1
 
 def fin():
@@ -193,15 +205,19 @@ def fin():
                     reiniciar=True 
                 if event.key==pygame.K_ESCAPE: 
                     sys.exit()
-     #zona dibujo
-        py
+     #zona dibujo 
+        pygame.draw.rect(screen, VERDE_C , (0,0,ancho_ventana,alto_ventana-30))
         textos("Ani",150,"PONG MX",NEGRO,(ancho_ventana//2)-(731//2),30)#texto pong
         textos("Ani",85,"Creditos: H. E. A. A.",NEGRO,(ancho_ventana//2)-(723//2),250) #texto preciona espacio
         textos("Ani",40,"Esc=Salir del juego, Espacio=reiniciar",NEGRO,(ancho_ventana//2)-(658/2),(alto_ventana//2)+(162//2)) #texto preciona espacio
         pygame.display.flip()
         clock.tick(60)                
 
+
+
 while True:
     inicio()
+    musica.play(-1)#play(-1) ciclar la musica infinitamente
+    pygame.mixer.Sound.set_volume(musica,0.1)#bajar volumen
     juego(coord_pelota_x,coord_pelota_y,player_1_y_coord,player_2_y_coord,player_2_y_speed,player_1_y_speed,speed_x,speed_y)
     fin()
