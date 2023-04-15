@@ -1,4 +1,4 @@
-#--------Movimiento de dibujo-------#
+#--------05_Juego_pong_basico_prt2-------#
 import pygame,sys
 pygame.init()
 
